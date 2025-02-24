@@ -4,7 +4,7 @@
 ## Autores
 
 * (Coordinador) [Marcos Francés Requena](https://github.com/mfr73ua)
-* [Nombre 2 Apellido 2 Apellido 2](https://github.com/alumno2)
+* [Rares Andrei Mocanu](https://github.com/ra-and5)
 * [Nombre 3 Apellido 3 Apellido 3](https://github.com/alumno3)
 * [Nombre 4 Apellido 4 Apellido 4](https://github.com/alumno4)
 * [Nombre 5 Apellido 5 Apellido 5](https://github.com/alumno5)
