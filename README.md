@@ -13,14 +13,15 @@
 [Cristina Cachero](https://github.com/ccacheroc)
 
 ## Requisitos
-* Gestión rutas, listado de ellas y filtrado por ubicación, dificultad o distancia.
-* Rutas exportadas en diferentes formatos (gpx, pdf).
+* Gestión rutas, listado de ellas y filtrado por ubicación, dificultad o distancia. -> Germán
+* Rutas exportadas en diferentes formatos (gpx, pdf y html) -> Marcos
 * Opción de calificar las rutas añadiendo una puntuación (mediante estrellas) y la posibilidad de subir fotos.
-* Registro de actividad de cada usuario, almacenando las rutas completadas por cada usuario.
-* Generación de informes mensuales en formato pdf con estadísticas personales, km recorridos, tiempo total de actividad...
-* Integración de mapas, con alguna API (aún por decidir) para mostrar las rutas en un formato útil y visual.
+* Registro de actividad de cada usuario, almacenando las rutas completadas por cada usuario. -> Marta
+* Generación de informes mensuales en formato pdf con estadísticas personales, km recorridos, tiempo total de actividad... -> Marta
+* Integración de mapas, con alguna API para mostrar las rutas en un formato útil y visual. -> Marcos
 * Obtención a su vez de información meteorológica de las rutas en tiempo real mediante otra API.
-* Posibilidad de exportar rutas para dispositivos GPS en formato gpx, ya sean relojes deportivos, ciclocomputadores o apps de senderismo para seguir las rutas mediante su realización con indicaciones. 
+* Posibilidad de exportar rutas para dispositivos GPS en formato gpx, ya sean relojes deportivos, ciclocomputadores o apps de senderismo para seguir las rutas mediante su realización con indicaciones. -> Marcos
+* Creación de una interfaz básica mediante la librería `tkinter` para la ejecución del proyecto. -> Marcos
 
 ## Instrucciones de instalación y ejecución
 [//]: # (Indicad aquí qué habría que hacer para ejecutar vuestra aplicación)
