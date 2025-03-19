@@ -1,6 +1,4 @@
-# Rutas turísticas en diversas ciudades
-[//]: # (Incluid aquí la descripción de vuestra aplicación. Por cierto, así se ponen comentarios en Markdown)
-
+# Rutas turísticas en Alicante
 ## Autores
 
 * (Coordinador) [Marcos Francés Requena](https://github.com/mfr73ua)
@@ -24,7 +22,10 @@
 * Creación de una interfaz básica mediante la librería `tkinter` para la ejecución del proyecto. -> Marcos
 
 ## Instrucciones de instalación y ejecución
-[//]: # (Indicad aquí qué habría que hacer para ejecutar vuestra aplicación)
+Para la instalación de las librerías necesarias para la ejecución del proyecto ejecute el siguiente comando:
+   ```bash
+   pip install -r requeriments.txt
+```
 
 ## Resumen de la API
 [//]: # (Cuando tengáis la API, añadiréis aquí la descripción de las diferentes llamadas.)
