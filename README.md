@@ -30,3 +30,10 @@ Para la instalación de las librerías necesarias para la ejecución del proyect
 ## Resumen de la API
 [//]: # (Cuando tengáis la API, añadiréis aquí la descripción de las diferentes llamadas.)
 [//]: # (Para la evaluación por pares, indicaréis aquí las diferentes opciones de vuestro menú textual, especificando para qué sirve cada una de ellas)
+El proyecto consiste en una aplicación para gestionar, calcular y exportar rutas utilizando datos geográficos proporcionados por OpenStreetMap mediante la biblioteca osmnx y la herramienta de geocodificación geopy. El sistema permite definir rutas manualmente (crear_rutas_manual.py) o de manera automática desde archivos JSON (crear_rutas_auto.py), almacenándolas y recuperándolas posteriormente (gestor_rutas.py).
+
+Para cada ruta definida, la aplicación puede calcular la trayectoria óptima con NetworkX (ruta.py y calcular_ruta.py). Estos cálculos consideran puntos intermedios, origen y destino, así como modos de transporte específicos como caminar, bicicleta o coche. Los resultados incluyen la distancia total y el tiempo estimado.
+
+Además, se generan reportes detallados en diferentes formatos: GPX (para sistemas GPS), PDF (para reportes impresos) y HTML interactivo (mapas generados con Folium) mediante funciones auxiliares implementadas en utils.py. Finalmente, la aplicación cuenta con una interfaz gráfica construida en Tkinter (interfaz.py), lo que facilita la interacción con el usuario y la integración con otros sistemas.
+
+El conjunto completo de dependencias necesarias para ejecutar el proyecto está especificado claramente en el archivo requirements.txt.
