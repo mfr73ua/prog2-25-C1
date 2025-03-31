@@ -11,28 +11,86 @@
 [Cristina Cachero](https://github.com/ccacheroc)
 
 ## Requisitos
-* Posibilidad de buscar en una base de datos en formato .json rutas con la opción de obtener un listado de ellas y un filtrado por ubicación, dificultad o distancia. -> 
-* Rutas exportadas en diferentes formatos (gpx, pdf y html) -> Marcos
-* Opción de calificar las rutas añadiendo una puntuación (mediante estrellas) y la posibilidad de subir fotos.
-* Registro de actividad de cada usuario, almacenando las rutas completadas por cada usuario en un archivo .json donde cada usuario tiene sus rutas guardadas. -> Marta
-* Generación de informes en formato pdf con estadísticas personales, km recorridos, tiempo total de actividad... -> Marta
-* Integración de mapas, con alguna API para mostrar las rutas en un formato útil y visual. -> Marcos
-* Obtención a su vez de información meteorológica de las rutas en tiempo real mediante otra API. -> 
-* Creación de una interfaz básica mediante la librería `tkinter` para la ejecución del proyecto. -> Marcos
+
+Este proyecto consiste en una aplicación completa para la **creación, gestión, visualización y exportación de rutas geográficas**. Diseñado con un enfoque modular y extensible, el sistema ofrece una experiencia amigable al usuario gracias a su **interfaz gráfica construida con Tkinter**. Su funcionalidad se centra en generar rutas dentro de la provincia de Alicante, aprovechando los datos de OpenStreetMap y la API de OpenWeatherMap para enriquecer la experiencia del usuario.
+
+---
+
+#### 🧭 Estructura del sistema de rutas
+
+El corazón del sistema es la clase `Ruta`, encargada de representar una ruta geográfica con todos sus metadatos: coordenadas, distancia, duración estimada, dificultad, y puntos relevantes. Internamente, se utiliza la biblioteca `osmnx` para construir un **grafo urbano basado en la red vial** de la ciudad, lo que permite calcular caminos óptimos entre origen, puntos intermedios y destino.
+
+Cada ruta generada se exporta automáticamente en cuatro formatos distintos:
+
+- **HTML interactivo** con el mapa visual y marcadores (vía Folium).
+- **Archivo GPX** compatible con dispositivos GPS.
+- **Informe PDF** con detalles como tramos, distancias y tiempo estimado.
+- **Imagen PNG** del mapa generado (usando Selenium para captura del HTML).
+
+Además, se clasifica automáticamente cada ruta según su **nivel de dificultad** (bajo, medio, alto) dependiendo de la distancia, y se estima la duración en función del medio de transporte elegido: caminar, bicicleta o coche.
+
+---
+
+#### 🛠️ Rutas manuales y automáticas
+
+El sistema ofrece dos formas principales de crear rutas:
+
+1. **Ruta Manual**: El usuario introduce el origen, puntos intermedios y destino de forma explícita, junto al modo de transporte y un nombre para la ruta. Esta opción brinda un control total sobre el recorrido y permite guardar la ruta directamente asociada al perfil del usuario.
+
+2. **Ruta Automática**: A partir de una lista de direcciones dadas, el sistema genera múltiples rutas aleatorias entre pares de puntos, seleccionando también al azar los puntos intermedios y el medio de transporte. Esta funcionalidad es útil para descubrir nuevos recorridos de manera rápida y sin esfuerzo.
+
+Todas las rutas creadas quedan almacenadas como archivos `.json` y se asocian al usuario correspondiente dentro de una base de datos persistente en `usuarios.json`.
+
+---
+
+#### 👤 Gestión de usuarios y relaciones sociales
+
+El sistema incluye un **módulo completo de autenticación** que permite a los usuarios registrarse, iniciar sesión y almacenar sus rutas. Los datos personales (nombre, email, ciudad, etc.) se guardan junto con una lista de rutas creadas y una lista de amigos.
+
+La lógica de amistad se basa en la detección automática de **rutas compartidas**: si dos usuarios tienen al menos una ruta en común, se consideran amigos. La interfaz permite consultar las rutas en común con cada amigo y acceder a sus archivos exportados.
+
+Cada usuario puede visualizar sus rutas guardadas, abrir el archivo PDF o HTML asociado directamente desde la interfaz, y consultar información básica como origen, destino, y modo de transporte.
+
+---
+
+#### ☁️ Consulta meteorológica integrada
+
+Una de las funcionalidades destacadas es la **consulta del clima** usando la API de OpenWeatherMap. El usuario puede introducir cualquier ciudad (por defecto, se espera que sea en España) y obtener información actualizada sobre:
+
+- Temperatura
+- Humedad
+- Descripción del clima
+- Velocidad del viento
+- Fecha y hora de la medición
+
+Esto permite planificar rutas de forma más informada, anticipando posibles condiciones meteorológicas adversas.
+
+---
+
+#### 🧩 Modularidad y código organizado
+
+El proyecto está dividido en módulos altamente cohesivos y con responsabilidades bien definidas:
+
+- `ruta.py`, `ruta_auto.py`, `ruta_manual.py`: gestión de rutas.
+- `utils.py`: funciones de exportación.
+- `usuario.py`: clase para manejar usuarios.
+- `gestor_rutas.py`: carga, filtrado y análisis de rutas.
+- `geocodificador.py`: conversión de direcciones en coordenadas.
+- `servicio_clima.py`: consulta del clima mediante API.
+- `interfaz.py`: interfaz gráfica completa con menús y formularios.
+- `main.py`: punto de entrada para ejecutar la app o generar rutas masivas.
+
+La estructura del código está pensada para facilitar **la extensión futura** (por ejemplo, añadir nuevas formas de filtrado de rutas o integración con APIs de cualquier otro tipo).
+
 
 ## Instrucciones de instalación y ejecución
 Para la instalación de las librerías necesarias para la ejecución del proyecto ejecute el siguiente comando:
    ```bash
    pip install -r requeriments.txt
 ```
+A continuación con la simple ejecución del fichero `main.py` bastaría para probar nuestro proyecto.
 
 ## Resumen de la API
 [//]: # (Cuando tengáis la API, añadiréis aquí la descripción de las diferentes llamadas.)
 [//]: # (Para la evaluación por pares, indicaréis aquí las diferentes opciones de vuestro menú textual, especificando para qué sirve cada una de ellas)
-El proyecto consiste en una aplicación para gestionar, calcular y exportar rutas utilizando datos geográficos proporcionados por OpenStreetMap mediante la biblioteca osmnx y la herramienta de geocodificación geopy. El sistema permite definir rutas manualmente (crear_rutas_manual.py) o de manera automática desde archivos JSON (crear_rutas_auto.py), almacenándolas y recuperándolas posteriormente (gestor_rutas.py).
 
-Para cada ruta definida, la aplicación puede calcular la trayectoria óptima con NetworkX (ruta.py y calcular_ruta.py). Estos cálculos consideran puntos intermedios, origen y destino, así como modos de transporte específicos como caminar, bicicleta o coche. Los resultados incluyen la distancia total y el tiempo estimado.
-
-Además, se generan reportes detallados en diferentes formatos: GPX (para sistemas GPS), PDF (para reportes impresos) y HTML interactivo (mapas generados con Folium) mediante funciones auxiliares implementadas en utils.py. Finalmente, la aplicación cuenta con una interfaz gráfica construida en Tkinter (interfaz.py), lo que facilita la interacción con el usuario y la integración con otros sistemas.
-
-El conjunto completo de dependencias necesarias para ejecutar el proyecto está especificado claramente en el archivo requirements.txt.
