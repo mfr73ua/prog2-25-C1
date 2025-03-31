@@ -94,3 +94,11 @@ A continuación con la simple ejecución del fichero `main.py` bastaría para pr
 [//]: # (Cuando tengáis la API, añadiréis aquí la descripción de las diferentes llamadas.)
 [//]: # (Para la evaluación por pares, indicaréis aquí las diferentes opciones de vuestro menú textual, especificando para qué sirve cada una de ellas)
 
+Actualmente, el sistema cuenta con una API sencilla que permite procesar rutas desde el backend. Esta API está pensada como punto de entrada para automatizar la generación de rutas y obtener archivos exportados como GPX, PDF y HTML sin necesidad de usar la interfaz gráfica. El endpoint principal disponible es `/procesar_ruta`, accesible mediante una petición POST.
+
+Al enviar una solicitud a esta ruta, el sistema genera automáticamente una o varias rutas utilizando combinaciones predefinidas de direcciones reales en Alicante. Internamente, se calcula el grafo de calles, se buscan los caminos más cortos y se exportan los archivos asociados para cada ruta. La respuesta de la API devuelve un resumen de los archivos generados o un mensaje de error si algo falla en el proceso.
+
+Aunque actualmente no se reciben parámetros personalizados en la petición (es decir, no puedes indicar tus propios puntos aún), el sistema está preparado para crecer fácilmente. En el futuro, se podría ampliar esta API para aceptar datos como origen, destino, puntos intermedios, modo de transporte o usuario asociado, haciendo que el sistema sea totalmente interactivo desde cualquier frontend o sistema externo.
+
+En resumen, esta API sirve como una base funcional para automatizar la creación de rutas. Es ideal para pruebas, generación masiva de rutas o integración inicial con otros servicios. Puedes probarla localmente enviando una petición POST a `http://127.0.0.1:5000/procesar_ruta`.
+
