@@ -16,7 +16,31 @@ Este proyecto consiste en una aplicación completa para la **creación, gestión
 
 ---
 
-#### 🧭 Estructura del sistema de rutas
+#### 🧭 Estructura de archivos del sistema de rutas
+
+A continuación se muestra la estructura del proyecto:
+
+```
+.
+├── rutas/
+├── static/
+├── tests/
+│   ├── test1.py
+│   ├── test2.py
+│   ├── test3.py
+│   ├── test4.py
+│   ├── test5.py
+│   ├── test6.py
+├── requirements.txt
+├── run.py
+├── ruta_auto.py
+├── ruta_manual.py
+├── ruta.py
+├── servicio_clima.py
+├── usuario.py
+├── usuarios.json
+└── utils.py
+```
 
 El corazón del sistema es la clase `Ruta`, encargada de representar una ruta geográfica con todos sus metadatos: coordenadas, distancia, duración estimada, dificultad, y puntos relevantes. Internamente, se utiliza la biblioteca `osmnx` para construir un **grafo urbano basado en la red vial** de la ciudad, lo que permite calcular caminos óptimos entre origen, puntos intermedios y destino.
 
