@@ -1,0 +1,18 @@
+{
+    "nombre": "ruta_auto_2",
+    "ubicacion": [
+        38.32650403802538,
+        -0.41013951824926376
+    ],
+    "distancia": "7.23 km",
+    "duracion": "28 min",
+    "dificultad": "bajo",
+    "fecha_registro": "2025-04-02 13:29:30",
+    "origen": "Puerto de Alicante",
+    "puntos_intermedios": [
+        "Museo de Arte Contemporáneo",
+        "Plaza de Toros de Alicante"
+    ],
+    "destino": "Parque de Canalejas",
+    "modo_transporte": "bike"
+}

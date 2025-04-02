@@ -1,0 +1,18 @@
+{
+    "nombre": "alicante_carla_walk",
+    "ubicacion": [
+        38.3569429515417,
+        -0.30791002199206213
+    ],
+    "distancia": "1.67 km",
+    "duracion": "20 min",
+    "dificultad": "bajo",
+    "fecha_registro": "2025-04-02 12:56:17",
+    "origen": "Explanada de España",
+    "puntos_intermedios": [
+        "Ayuntamiento de Alicante",
+        "Concatedral de San Nicolás"
+    ],
+    "destino": "Castillo de Santa Bárbara",
+    "modo_transporte": "walk"
+}
