@@ -14,9 +14,43 @@
 
 Este proyecto consiste en una aplicación completa para la **creación, gestión, visualización y exportación de rutas geográficas**. Diseñado con un enfoque modular y extensible, el sistema ofrece una experiencia amigable al usuario gracias a su **interfaz gráfica construida con Tkinter**. Su funcionalidad se centra en generar rutas dentro de la provincia de Alicante, aprovechando los datos de OpenStreetMap y la API de OpenWeatherMap para enriquecer la experiencia del usuario.
 
----
 
-#### 🧭 Estructura del sistema de rutas
+### 🧭 Estructura de archivos del sistema de rutas
+
+A continuación se muestra la estructura del proyecto:
+
+```
+.
+├── api/
+|   ├── __init__.py
+|   ├── clima.py
+|   ├── rutas.py
+|   ├── usuarios.py
+├── rutas/
+├── static/
+├── tests/
+│   ├── test1.py
+│   ├── test2.py
+│   ├── test3.py
+│   ├── test4.py
+│   ├── test5.py
+│   ├── test6.py
+├── app_instance.py
+├── distribucion.txt # Distribución de tareas entre los integrantes del grupo
+├── geocodificador.py
+├── gestor_rutas.py
+├── interfaz.py
+├── main.py
+├── requirements.txt
+├── run.py
+├── ruta_auto.py
+├── ruta_manual.py
+├── ruta.py
+├── servicio_clima.py
+├── usuario.py
+├── usuarios.json
+└── utils.py
+```
 
 El corazón del sistema es la clase `Ruta`, encargada de representar una ruta geográfica con todos sus metadatos: coordenadas, distancia, duración estimada, dificultad, y puntos relevantes. Internamente, se utiliza la biblioteca `osmnx` para construir un **grafo urbano basado en la red vial** de la ciudad, lo que permite calcular caminos óptimos entre origen, puntos intermedios y destino.
 
@@ -29,9 +63,8 @@ Cada ruta generada se exporta automáticamente en cuatro formatos distintos:
 
 Además, se clasifica automáticamente cada ruta según su **nivel de dificultad** (bajo, medio, alto) dependiendo de la distancia, y se estima la duración en función del medio de transporte elegido: caminar, bicicleta o coche.
 
----
 
-#### 🛠️ Rutas manuales y automáticas
+### 🛠️ Rutas manuales y automáticas
 
 El sistema ofrece dos formas principales de crear rutas:
 
@@ -41,9 +74,8 @@ El sistema ofrece dos formas principales de crear rutas:
 
 Todas las rutas creadas quedan almacenadas como archivos `.json` y se asocian al usuario correspondiente dentro de una base de datos persistente en `usuarios.json`.
 
----
 
-#### 👤 Gestión de usuarios y relaciones sociales
+### 👤 Gestión de usuarios y relaciones sociales
 
 El sistema incluye un **módulo completo de autenticación** que permite a los usuarios registrarse, iniciar sesión y almacenar sus rutas. Los datos personales (nombre, email, ciudad, etc.) se guardan junto con una lista de rutas creadas y una lista de amigos.
 
@@ -51,9 +83,8 @@ La lógica de amistad se basa en la detección automática de **rutas compartida
 
 Cada usuario puede visualizar sus rutas guardadas, abrir el archivo PDF o HTML asociado directamente desde la interfaz, y consultar información básica como origen, destino, y modo de transporte.
 
----
 
-#### ☁️ Consulta meteorológica integrada
+### ☁️ Consulta meteorológica integrada
 
 Una de las funcionalidades destacadas es la **consulta del clima** usando la API de OpenWeatherMap. El usuario puede introducir cualquier ciudad (por defecto, se espera que sea en España) y obtener información actualizada sobre:
 
@@ -65,9 +96,7 @@ Una de las funcionalidades destacadas es la **consulta del clima** usando la API
 
 Esto permite planificar rutas de forma más informada, anticipando posibles condiciones meteorológicas adversas.
 
----
-
-#### 🧩 Modularidad y código organizado
+### 🧩 Modularidad y código organizado
 
 El proyecto está dividido en módulos altamente cohesivos y con responsabilidades bien definidas:
 
@@ -80,25 +109,34 @@ El proyecto está dividido en módulos altamente cohesivos y con responsabilidad
 - `interfaz.py`: interfaz gráfica completa con menús y formularios.
 - `main.py`: punto de entrada para ejecutar la app o generar rutas masivas.
 
-La estructura del código está pensada para facilitar **la extensión futura** (por ejemplo, añadir nuevas formas de filtrado de rutas o integración con APIs de cualquier otro tipo).
-
-
 ## Instrucciones de instalación y ejecución
+Para la ejecución del código recomendamos clonar el repositorio desde el siguiente comando:
+   ```bash
+   git clone https://github.com/mfr73ua/prog2-25-C1.git
+   ```
+A continuación recomendamos la creación de un venv:
+   ```bash
+   python3 -m venv <nombre_venv>
+   ```
+Activamos el venv:
+   ```bash
+   source <nombre_venv>/bin/activate
+   ```
 Para la instalación de las librerías necesarias para la ejecución del proyecto ejecute el siguiente comando:
    ```bash
    pip install -r requeriments.txt
-```
-A continuación con la simple ejecución del fichero `main.py` bastaría para probar nuestro proyecto.
+   ```
+
+A continuación con la simple ejecución del fichero `main.py` bastaría para probar nuestro proyecto en formato aplicación convencional.
+
 
 ## Resumen de la API
-[//]: # (Cuando tengáis la API, añadiréis aquí la descripción de las diferentes llamadas.)
-[//]: # (Para la evaluación por pares, indicaréis aquí las diferentes opciones de vuestro menú textual, especificando para qué sirve cada una de ellas)
 
 Actualmente, el sistema cuenta con una API sencilla que permite procesar rutas desde el backend. Esta API está pensada como punto de entrada para automatizar la generación de rutas y obtener archivos exportados como GPX, PDF y HTML sin necesidad de usar la interfaz gráfica. El endpoint principal disponible es `/procesar_ruta`, accesible mediante una petición POST.
 
 Al enviar una solicitud a esta ruta, el sistema genera automáticamente una o varias rutas utilizando combinaciones predefinidas de direcciones reales en Alicante. Internamente, se calcula el grafo de calles, se buscan los caminos más cortos y se exportan los archivos asociados para cada ruta. La respuesta de la API devuelve un resumen de los archivos generados o un mensaje de error si algo falla en el proceso.
 
-Aunque actualmente no se reciben parámetros personalizados en la petición (es decir, no puedes indicar tus propios puntos aún), el sistema está preparado para crecer fácilmente. En el futuro, se podría ampliar esta API para aceptar datos como origen, destino, puntos intermedios, modo de transporte o usuario asociado, haciendo que el sistema sea totalmente interactivo desde cualquier frontend o sistema externo.
+En resumen, esta API sirve como una base funcional para automatizar la creación de rutas. Es ideal para pruebas, generación masiva de rutas o integración inicial con otros servicios. 
 
-En resumen, esta API sirve como una base funcional para automatizar la creación de rutas. Es ideal para pruebas, generación masiva de rutas o integración inicial con otros servicios. Puedes probarla localmente enviando una petición POST a `http://127.0.0.1:5000/procesar_ruta`.
+El sistema se puede ejecutar tanto como una aplicación normal con la interfaz gráfica en Tkinter como en modo API, lo cual permite automatizar la creación de rutas desde el backend sin necesidad de utilizar la interfaz gráfica. Para usarlo en modo gráfico, ejecuta `main.py`. Para usarlo como API, ejecuta `run.py`, y a continuación, si desea hacer unas pruebas, ejecute los diferentes tests alojados en el directorio `tests/` o pruebe la API desde un navegador o incluso desde la aplicación [Postman](https://www.postman.com/). En ambos casos, los archivos generados por el sistema (PDF, GPX, HTML, etc.) se guardarán en las carpetas correspondientes.
 
