@@ -21,6 +21,11 @@ A continuación se muestra la estructura del proyecto:
 
 ```
 .
+├── api/
+|   ├── __init__.py
+|   ├── clima.py
+|   ├── rutas.py
+|   ├── usuarios.py
 ├── rutas/
 ├── static/
 ├── tests/
@@ -29,7 +34,7 @@ A continuación se muestra la estructura del proyecto:
 │   ├── test3.py
 │   ├── test4.py
 │   ├── test5.py
-│   ├── test6.py
+├── app_instance.py
 ├── requirements.txt
 ├── run.py
 ├── ruta_auto.py
