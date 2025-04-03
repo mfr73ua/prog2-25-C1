@@ -66,7 +66,7 @@ class RutaManual:
             # Asegurarse de que el usuario exista
             if usuario.username:
                 usuario.rutas.append(ruta.nombre)
-                with open("usuarios.json", "r+", encoding="utf-8") as f:
+                with open("usuarios.json", "r+") as f:
                     usuarios = json.load(f)
                     for user in usuarios:
                         if user["username"] == usuario.username:
@@ -76,9 +76,16 @@ class RutaManual:
                     json.dump(usuarios, f, indent=4, ensure_ascii=False)
 
         # Exportar a PDF, GPX y HTML
-        pdf_filename = exportar_pdf(ruta.distancias, ruta.tiempos_estimados, ruta.modo_transporte, ruta.nombre, ruta.origen, ruta.puntos_intermedios, ruta.destino)
-        gpx_filename = exportar_gpx(ruta.rutas, ruta.grafo, ruta.timestamp)
-        html_filename = generar_mapa(ruta.origen, ruta.puntos_intermedios, ruta.destino, ruta.rutas, ruta.grafo, ruta.timestamp)
+        try:
+            pdf_filename = exportar_pdf(ruta.distancias, ruta.tiempos_estimados, ruta.modo_transporte, ruta.nombre, ruta.origen, ruta.puntos_intermedios, ruta.destino)
+            gpx_filename = exportar_gpx(ruta.rutas, ruta.grafo, ruta.timestamp)
+            html_filename = generar_mapa(ruta.origen, ruta.puntos_intermedios, ruta.destino, ruta.rutas, ruta.grafo, ruta.timestamp)
+        except Exception as e:
+            raise RuntimeError(f"Error al exportar archivos: {e}")
+
+        # Verificación de éxito
+        if not all([pdf_filename, gpx_filename, html_filename]):
+            raise ValueError("No se pudieron generar todos los archivos correctamente.")
 
         # Regresar las rutas generadas
         return pdf_filename, gpx_filename, html_filename
