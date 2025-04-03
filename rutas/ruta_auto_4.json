@@ -1,0 +1,17 @@
+{
+    "nombre": "ruta_auto_4",
+    "ubicacion": [
+        38.37785362657178,
+        -0.498051674913628
+    ],
+    "distancia": "2.44 km",
+    "duracion": "9 min",
+    "dificultad": "bajo",
+    "fecha_registro": "2025-03-31 10:24:28",
+    "origen": "Plaza de los Luceros",
+    "puntos_intermedios": [
+        "Avenida de Maisonnave"
+    ],
+    "destino": "Playa del Postiguet",
+    "modo_transporte": "bike"
+}

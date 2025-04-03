@@ -1,0 +1,18 @@
+{
+    "nombre": "alicante_ruta_paula",
+    "ubicacion": [
+        38.31433484090276,
+        -0.4411411677854338
+    ],
+    "distancia": "1.47 km",
+    "duracion": "17 min",
+    "dificultad": "bajo",
+    "fecha_registro": "2025-04-03 12:53:29",
+    "origen": "Explanada de España",
+    "puntos_intermedios": [
+        "Concatedral de San Nicolás",
+        "Ayuntamiento de Alicante"
+    ],
+    "destino": "Castillo de Santa Bárbara",
+    "modo_transporte": "walk"
+}

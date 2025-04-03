@@ -1,0 +1,18 @@
+{
+    "nombre": "ruta_bici_adrian",
+    "ubicacion": [
+        38.31613571053876,
+        -0.3797143877017371
+    ],
+    "distancia": "2.77 km",
+    "duracion": "11 min",
+    "dificultad": "bajo",
+    "fecha_registro": "2025-04-03 13:08:35",
+    "origen": "Playa del Postiguet",
+    "puntos_intermedios": [
+        "Rambla de Mendez Nuñez",
+        "Teatro Principal de Alicante"
+    ],
+    "destino": "Calle Belando 30",
+    "modo_transporte": "bike"
+}

@@ -1,0 +1,17 @@
+{
+    "nombre": "ruta_auto_5",
+    "ubicacion": [
+        38.33706930913353,
+        -0.4027744949885641
+    ],
+    "distancia": "2.15 km",
+    "duracion": "25 min",
+    "dificultad": "bajo",
+    "fecha_registro": "2025-03-31 10:24:41",
+    "origen": "Playa del Postiguet",
+    "puntos_intermedios": [
+        "Plaza de los Luceros"
+    ],
+    "destino": "Avenida de Maisonnave",
+    "modo_transporte": "walk"
+}

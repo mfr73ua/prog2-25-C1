@@ -2,9 +2,8 @@ import folium
 import gpxpy
 import gpxpy.gpx
 from fpdf import FPDF
-from geopy.distance import geodesic
 import os
-from typing import List, Tuple, Dict
+from typing import List, Tuple
 import networkx as nx
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -185,7 +184,7 @@ def exportar_pdf(
     pdf.cell(0, 10, "Ruta:", ln=True)
     pdf.set_font("Arial", '', 12)
     pdf.cell(0, 10, f"- Origen: {origen}", ln=True)
-    pdf.cell(0, 10, f"- Puntos intermedios: {', '.join(puntos_intermedios)}", ln=True)
+    pdf.cell(0, 10, f"- Puntos intermedios: {', '.join(str(p) for p in puntos_intermedios)}", ln=True)
     pdf.cell(0, 10, f"- Destino: {destino}", ln=True)
     pdf.ln(5)
 
@@ -239,7 +238,7 @@ def exportar_png_desde_html(html_path: str, output_path: str, delay: int = 3) ->
     """
     chrome_options = Options()
     chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--window-size=1200,800")
+    chrome_options.add_argument("--window-size=1400,1000")
     chrome_options.add_argument("--disable-gpu")
 
     # Cambia 'chromedriver' si tienes el ejecutable en otra ruta
