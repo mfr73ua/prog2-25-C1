@@ -21,6 +21,11 @@ A continuación se muestra la estructura del proyecto:
 
 ```
 .
+├── api/
+|   ├── __init__.py
+|   ├── clima.py
+|   ├── rutas.py
+|   ├── usuarios.py
 ├── rutas/
 ├── static/
 ├── tests/
@@ -30,6 +35,12 @@ A continuación se muestra la estructura del proyecto:
 │   ├── test4.py
 │   ├── test5.py
 │   ├── test6.py
+├── app_instance.py
+├── distribucion.txt # Distribución de tareas entre los integrantes del grupo
+├── geocodificador.py
+├── gestor_rutas.py
+├── interfaz.py
+├── main.py
 ├── requirements.txt
 ├── run.py
 ├── ruta_auto.py
@@ -125,7 +136,10 @@ Actualmente, el sistema cuenta con una API sencilla que permite procesar rutas d
 
 Al enviar una solicitud a esta ruta, el sistema genera automáticamente una o varias rutas utilizando combinaciones predefinidas de direcciones reales en Alicante. Internamente, se calcula el grafo de calles, se buscan los caminos más cortos y se exportan los archivos asociados para cada ruta. La respuesta de la API devuelve un resumen de los archivos generados o un mensaje de error si algo falla en el proceso.
 
-Aunque actualmente no se reciben parámetros personalizados en la petición (es decir, no puedes indicar tus propios puntos aún), el sistema está preparado para crecer fácilmente. En resumen, esta API sirve como una base funcional para automatizar la creación de rutas. Es ideal para pruebas, generación masiva de rutas o integración inicial con otros servicios. 
+En resumen, esta API sirve como una base funcional para automatizar la creación de rutas. Es ideal para pruebas, generación masiva de rutas o integración inicial con otros servicios. 
+
+El sistema se puede ejecutar tanto como una aplicación normal con la interfaz gráfica en Tkinter como en modo API, lo cual permite automatizar la creación de rutas desde el backend sin necesidad de utilizar la interfaz gráfica. Para usarlo en modo gráfico, ejecuta `main.py`. Para usarlo como API, ejecuta `run.py`, y a continuación, si desea hacer unas pruebas, ejecute los diferentes tests alojados en el directorio `tests/` o pruebe la API desde un navegador o incluso desde la aplicación [Postman](https://www.postman.com/). En ambos casos, los archivos generados por el sistema (PDF, GPX, HTML, etc.) se guardarán en las carpetas correspondientes. Aunque actualmente no se reciben parámetros personalizados en la petición (es decir, no puedes indicar tus propios puntos aún), el sistema está preparado para crecer fácilmente. En resumen, esta API sirve como una base funcional para automatizar la creación de rutas. Es ideal para pruebas, generación masiva de rutas o integración inicial con otros servicios. 
 
 El sistema se puede ejecutar tanto como una aplicación normal con la interfaz gráfica en Tkinter como en modo API, lo cual permite automatizar la creación de rutas desde el backend sin necesidad de utilizar la interfaz gráfica. Para usarlo en modo gráfico, ejecuta `main.py`. Para usarlo como API, ejecuta `run.py`, y a continuación, si desea hacer unas pruebas, ejecute los diferentes tests alojados en el directorio tests/. En ambos casos, los archivos generados por el sistema (PDF, GPX, HTML, etc.) se guardarán en las carpetas correspondientes.
+
 
