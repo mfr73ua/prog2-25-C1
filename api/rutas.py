@@ -1,16 +1,32 @@
-# api/rutas.py
-from app_instance import app
 from flask import request, jsonify, send_from_directory
+from app_instance import app
 from ruta_manual import RutaManual
 from ruta_auto import RutaAuto
 from usuario import Usuario
 from ruta import Ruta
+from gestor_rutas import GestorRutas
 import os
 import json
 
 # Crear ruta manual
 @app.route("/api/ruta_manual", methods=["POST"])
 def crear_manual():
+    """
+    Crea una ruta manual a partir de los datos proporcionados por el usuario.
+
+    Recibe los datos de la ruta, incluidos el origen, los puntos intermedios, el destino,
+    el modo de transporte y el nombre de la ruta. Si la creación es exitosa, devuelve los enlaces
+    a los archivos PDF, GPX y HTML generados. Si ocurre algún error, se retorna un mensaje de error.
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    Response
+        Retorna un JSON con el mensaje de éxito y los archivos generados, o un mensaje de error.
+    """
     data = request.json
     usuario = Usuario.iniciar_sesion(data["username"], data["password"])
     if not usuario:
@@ -27,6 +43,21 @@ def crear_manual():
 # Crear rutas automáticas
 @app.route("/api/ruta_auto", methods=["POST"])
 def crear_auto():
+    """
+    Crea rutas automáticas basadas en un conjunto de direcciones proporcionadas por el usuario.
+
+    Recibe un conjunto de direcciones y una cantidad de rutas a generar. Si la creación es exitosa,
+    devuelve un JSON con los enlaces a las rutas generadas. En caso de error, se retorna un mensaje de error.
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    Response
+        Retorna un JSON con el mensaje de éxito y las rutas generadas, o un mensaje de error.
+    """
     data = request.json
     usuario = Usuario.iniciar_sesion(data["username"], data["password"])
     if not usuario:
@@ -38,106 +69,97 @@ def crear_auto():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# Listar rutas con filtros
 @app.route("/api/rutas", methods=["GET"])
-def listar_rutas():
-    rutas = Ruta.listar_rutas()
+def obtener_rutas_filtradas():
+    """
+    Obtiene rutas filtradas según los parámetros proporcionados por el usuario.
+
+    Este endpoint recibe varios parámetros de filtro, como la dificultad, la distancia máxima,
+    la duración máxima y el modo de transporte. Retorna un JSON con las rutas que cumplen con los filtros,
+    o un mensaje de error si ocurre algún problema al aplicar los filtros.
+
+    Parameters
+    ----------
+    dificultad : str, opcional
+        La dificultad de las rutas a filtrar (bajo, medio, alto).
+    max_km : float, opcional
+        La distancia máxima de las rutas a filtrar.
+    max_horas : float, opcional
+        La duración máxima de las rutas a filtrar.
+    transporte : str, opcional
+        El medio de transporte a filtrar (walk, bike, drive).
+
+    Returns
+    -------
+    Response
+        Retorna un JSON con las rutas filtradas, o un mensaje de error si ocurre un problema.
+    """
+    gestor = GestorRutas()
+    rutas_filtradas = gestor.rutas
+
+    # Aplicar filtros individualmente
     dificultad = request.args.get("dificultad")
-    modo = request.args.get("modo")
-    distancia_max = request.args.get("distancia_max", type=float)
-    duracion_max = request.args.get("duracion_max", type=float)
-
     if dificultad:
-        rutas = [r for r in rutas if r.get("dificultad", "").lower() == dificultad.lower()]
-    if modo:
-        rutas = [r for r in rutas if r.get("modo_transporte", "").lower() == modo.lower()]
-    if distancia_max:
-        rutas = [r for r in rutas if float(str(r.get("distancia", "0")).split()[0]) <= distancia_max]
-    if duracion_max:
-        rutas = [r for r in rutas if float(str(r.get("duracion", "0")).split()[0]) <= duracion_max]
+        rutas_filtradas = gestor.filtrar_por_dificultad(dificultad)
 
-    return jsonify({"rutas": rutas})
+    max_km = request.args.get("max_km")
+    if max_km:
+        rutas_filtradas = [r for r in rutas_filtradas if r in gestor.filtrar_por_distancia(float(max_km))]
+
+    max_horas = request.args.get("max_horas")
+    if max_horas:
+        rutas_filtradas = [r for r in rutas_filtradas if r in gestor.filtrar_por_duracion(float(max_horas))]
+
+    transporte = request.args.get("transporte")
+    if transporte:
+        try:
+            rutas_filtradas = [r for r in rutas_filtradas if r in gestor.filtrar_por_transporte(transporte)]
+        except ValueError:
+            return jsonify({"error": "Modo de transporte no válido"}), 400
+
+    return jsonify({"rutas": rutas_filtradas})
+
 
 # Descargar PDF de ruta
 @app.route("/api/rutas/<nombre>/pdf", methods=["GET"])
 def descargar_pdf(nombre):
+    """
+    Permite descargar el archivo PDF de la ruta especificada por nombre.
+
+    Recibe el nombre de la ruta y busca el archivo PDF correspondiente en el directorio estático.
+    Si el archivo existe, se envía como respuesta, de lo contrario se muestra un error.
+
+    Parameters
+    ----------
+    nombre : str
+        El nombre de la ruta para la que se desea descargar el archivo PDF.
+
+    Returns
+    -------
+    Response
+        Retorna el archivo PDF correspondiente a la ruta, o un mensaje de error si no se encuentra el archivo.
+    """
     path = f"{nombre}.pdf"
     return send_from_directory("static", path, as_attachment=True)
 
 # Descargar HTML de ruta
 @app.route("/api/rutas/<nombre>/html", methods=["GET"])
 def descargar_html(nombre):
+    """
+    Permite descargar el archivo HTML de la ruta especificada por nombre.
+
+    Recibe el nombre de la ruta y busca el archivo HTML correspondiente en el directorio estático.
+    Si el archivo existe, se envía como respuesta, de lo contrario se muestra un error.
+
+    Parameters
+    ----------
+    nombre : str
+        El nombre de la ruta para la que se desea descargar el archivo HTML.
+
+    Returns
+    -------
+    Response
+        Retorna el archivo HTML correspondiente a la ruta, o un mensaje de error si no se encuentra el archivo.
+    """
     path = f"rutas_{nombre}.html"
     return send_from_directory("static", path, as_attachment=True)
-
-# Actualizar datos de una ruta
-@app.route("/api/rutas/<nombre>", methods=["PUT"])
-def actualizar_ruta(nombre):
-    data = request.json
-    ruta_path = os.path.join("rutas", f"{nombre}.json")
-    if not os.path.exists(ruta_path):
-        return jsonify({"error": "Ruta no encontrada"}), 404
-
-    try:
-        with open(ruta_path, "r+", encoding="utf-8") as f:
-            ruta = json.load(f)
-            ruta["origen"] = data.get("origen", ruta["origen"])
-            ruta["intermedios"] = data.get("intermedios", ruta["intermedios"])
-            ruta["destino"] = data.get("destino", ruta["destino"])
-            ruta["modo_transporte"] = data.get("modo", ruta["modo_transporte"])
-            ruta["dificultad"] = data.get("dificultad", ruta["dificultad"])
-            ruta["duracion"] = data.get("duracion", ruta["duracion"])
-            f.seek(0)
-            json.dump(ruta, f, ensure_ascii=False, indent=4)
-            f.truncate()
-        return jsonify({"mensaje": "Ruta actualizada correctamente"})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-# Eliminar una ruta
-@app.route("/api/rutas/<nombre>", methods=["DELETE"])
-def eliminar_ruta(nombre):
-    ruta_path = os.path.join("rutas", f"{nombre}.json")
-    if not os.path.exists(ruta_path):
-        return jsonify({"error": "Ruta no encontrada"}), 404
-
-    try:
-        os.remove(ruta_path)
-        pdf_path = os.path.join("static", f"{nombre}.pdf")
-        html_path = os.path.join("static", f"rutas_{nombre}.html")
-        if os.path.exists(pdf_path):
-            os.remove(pdf_path)
-        if os.path.exists(html_path):
-            os.remove(html_path)
-
-        usuarios = Usuario.cargar_usuarios()
-        for usuario in usuarios:
-            if nombre in usuario.get("rutas", []):
-                usuario["rutas"].remove(nombre)
-                Usuario.actualizar_usuarios(usuarios)
-
-        return jsonify({"mensaje": "Ruta eliminada correctamente"})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-# Obtener detalles de una ruta
-@app.route("/api/rutas/<nombre>", methods=["GET"])
-def obtener_detalles_ruta(nombre):
-    ruta_path = os.path.join("rutas", f"{nombre}.json")
-    if not os.path.exists(ruta_path):
-        return jsonify({"error": "Ruta no encontrada"}), 404
-
-    try:
-        with open(ruta_path, "r", encoding="utf-8") as f:
-            ruta = json.load(f)
-        return jsonify(ruta)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-# Buscar rutas por nombre
-@app.route("/api/rutas/buscar", methods=["GET"])
-def buscar_rutas():
-    nombre = request.args.get("nombre", "").lower()
-    rutas = Ruta.listar_rutas()
-    rutas_encontradas = [r for r in rutas if nombre in r["nombre"].lower()]
-    return jsonify({"rutas_encontradas": rutas_encontradas})

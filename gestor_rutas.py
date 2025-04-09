@@ -122,21 +122,24 @@ class GestorRutas:
                 continue
         return filtradas
 
-    def filtrar_por_transporte(self, modo_transporte: str):
+    def filtrar_por_transporte(self, modo_transporte: str) -> List[Dict[str, Any]]:
         """
         Devuelve una lista de rutas que usan el medio de transporte especificado.
 
         Parameters
         ----------
         modo_transporte : str
-            El medio de transporte a filtrar (por ejemplo: 'walk', 'bike', 'car').
+            El medio de transporte a filtrar (por ejemplo: 'walk', 'bike', 'drive').
 
         Returns
         -------
         list
             Lista de rutas que coinciden con ese modo de transporte.
         """
-        todos_los_transportes = {ruta["modo_transporte"].lower() for ruta in self.lista_rutas()}
-        if modo_transporte.lower() not in todos_los_transportes:
-            raise ValueError(f"Modo de transporte '{modo_transporte}' no válido. Modos disponibles: {', '.join(todos_los_transportes)}")
-        return [ruta for ruta in self.lista_rutas() if ruta["modo_transporte"].lower() == modo_transporte.lower()]
+        modo_transporte = modo_transporte.lower()
+        modos_disponibles = {ruta.get("modo_transporte", "").lower() for ruta in self.rutas}
+        
+        if modo_transporte not in modos_disponibles:
+            raise ValueError(f"Modo de transporte '{modo_transporte}' no válido. Modos disponibles: {', '.join(modos_disponibles)}")
+        
+        return [ruta for ruta in self.rutas if ruta.get("modo_transporte", "").lower() == modo_transporte]
