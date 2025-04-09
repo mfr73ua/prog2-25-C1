@@ -254,3 +254,32 @@ class Ruta:
                     except Exception:
                         continue
         return rutas
+    
+    def to_dict(self):
+        """
+        Convierte la instancia de la clase `Ruta` en un diccionario con sus atributos relevantes.
+
+        Este método crea un diccionario con los valores de los atributos de la ruta, incluyendo
+        el nombre, modo de transporte, distancia, duración y dificultad. Los métodos `distancia_str()` 
+        y `duracion_str()` son utilizados para obtener las representaciones en cadena de los atributos 
+        `distancia` y `duracion`.
+
+        Returns
+        -------
+        dict
+            Un diccionario con los siguientes campos:
+            - "nombre" (str): Nombre de la ruta.
+            - "modo_transporte" (str): Modo de transporte utilizado en la ruta.
+            - "distancia" (str): Distancia de la ruta, representada como cadena.
+            - "duracion" (str): Duración estimada de la ruta, representada como cadena.
+            - "dificultad" (str): Nivel de dificultad de la ruta.
+        """
+        return {
+            "nombre": self.nombre,
+            "modo_transporte": self.modo_transporte,
+            "distancia": self.distancia_str(),
+            "duracion": self.duracion_str(),
+            "dificultad": self.dificultad
+        }
+
+
