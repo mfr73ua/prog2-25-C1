@@ -3,12 +3,7 @@ import tkinter as tk
 from tkinter import messagebox
 import webbrowser
 import json
-
-from servicio_clima import GestorClima, ServicioOpenWeatherMap
-from usuario import Usuario
-from ruta_manual import RutaManual
-from ruta_auto import RutaAuto
-from gestor_rutas import GestorRutas
+import requests
 
 class Interfaz:
     """
@@ -23,17 +18,56 @@ class Interfaz:
     root : tkinter.Tk
         Ventana principal de la aplicación.
     """
+    
+    # URL base de la API
+    API_URL = "https://ra55.pythonanywhere.com"
 
     def __init__(self, root):
-        """Inicializa la interfaz, el servicio de clima y muestra la pantalla de login."""
+        """Inicializa la interfaz y muestra la pantalla de login."""
         self.root = root
         self.root.title("Gestor de Rutas - Login")
         self.usuario = None
-
-        self.servicio_clima = ServicioOpenWeatherMap(clave_api="5ead714f2ad83f23daf51c47124fd500")
-        self.gestor_clima = GestorClima(self.servicio_clima)
+        self.datos_usuario = None
 
         self.pantalla_login()
+        
+    def hacer_peticion(self, endpoint, metodo="GET", datos=None, params=None):
+        """
+        Realiza una petición a la API.
+        
+        Parameters
+        ----------
+        endpoint : str
+            Ruta del endpoint a consultar.
+        metodo : str, optional
+            Método HTTP a utilizar (GET, POST, etc.)
+        datos : dict, optional
+            Datos a enviar en formato JSON.
+        params : dict, optional
+            Parámetros de consulta.
+            
+        Returns
+        -------
+        dict
+            Respuesta de la API en formato JSON.
+        """
+        url = f"{self.API_URL}{endpoint}"
+        
+        try:
+            if metodo == "GET":
+                respuesta = requests.get(url, params=params)
+            elif metodo == "POST":
+                respuesta = requests.post(url, json=datos)
+            else:
+                raise ValueError(f"Método HTTP no soportado: {metodo}")
+                
+            if respuesta.status_code >= 400:
+                error_msg = respuesta.json().get("message", "Error desconocido")
+                raise Exception(f"Error en la API (código {respuesta.status_code}): {error_msg}")
+                
+            return respuesta.json()
+        except requests.RequestException as e:
+            raise Exception(f"Error de conexión: {str(e)}")
 
     def pantalla_login(self):
         """Muestra la pantalla de inicio de sesión con campos de usuario y contraseña."""
@@ -53,7 +87,7 @@ class Interfaz:
 
     def verificar_login(self):
         """
-        Verifica las credenciales ingresadas por el usuario.
+        Verifica las credenciales ingresadas por el usuario a través de la API.
 
         Si las credenciales son válidas, redirige a la pantalla principal.
         Si no, muestra un mensaje de error.
@@ -61,13 +95,26 @@ class Interfaz:
         username = self.entry_usuario.get().strip()
         password = self.entry_password.get().strip()
 
-        usuario = Usuario.iniciar_sesion(username, password)
-        if usuario:
-            self.usuario = usuario
-            messagebox.showinfo("Bienvenido", f"Hola {usuario.nombre}, ¡has iniciado sesión!")
-            self.pantalla_principal()
-        else:
-            messagebox.showerror("Error", "Usuario o contraseña incorrectos.")
+        if not username or not password:
+            messagebox.showerror("Error", "Por favor, complete todos los campos.")
+            return
+
+        try:
+            datos = {
+                "username": username,
+                "password": password
+            }
+            respuesta = self.hacer_peticion("/api/usuarios/login", metodo="POST", datos=datos)
+            
+            if respuesta["status"] == "success":
+                self.datos_usuario = respuesta["data"]
+                self.usuario = self.datos_usuario["username"]
+                messagebox.showinfo("Bienvenido", f"Hola {self.datos_usuario['nombre']}, ¡has iniciado sesión!")
+                self.pantalla_principal()
+            else:
+                messagebox.showerror("Error", "Usuario o contraseña incorrectos.")
+        except Exception as e:
+            messagebox.showerror("Error", str(e))
 
     def abrir_ventana_registro(self):
         """Muestra el formulario de registro para nuevos usuarios."""
@@ -84,10 +131,11 @@ class Interfaz:
             self.entries_registro.append(entry)
 
         tk.Button(self.root, text="Registrar", command=self.registrar_usuario).pack(pady=10)
+        tk.Button(self.root, text="Volver", command=self.pantalla_login).pack(pady=5)
 
     def registrar_usuario(self):
         """
-        Registra al usuario con los datos ingresados en el formulario.
+        Registra al usuario con los datos ingresados en el formulario a través de la API.
 
         Si los campos están completos y el nombre de usuario no existe, se registra correctamente.
         """
@@ -99,19 +147,35 @@ class Interfaz:
 
         nombre, apellido, email, username, telefono, fecha_nacimiento, ciudad, password = datos
 
-        if Usuario.registrar_usuario(nombre, apellido, email, username, telefono, fecha_nacimiento, ciudad, password):
-            messagebox.showinfo("Registro exitoso", "¡Te has registrado correctamente!")
-            self.pantalla_login()
-        else:
-            messagebox.showerror("Error", "El nombre de usuario ya existe.")
+        try:
+            datos_registro = {
+                "nombre": nombre,
+                "apellido": apellido,
+                "email": email,
+                "username": username,
+                "telefono": telefono,
+                "fecha_nacimiento": fecha_nacimiento,
+                "ciudad": ciudad,
+                "password": password
+            }
+            
+            respuesta = self.hacer_peticion("/api/usuarios/registro", metodo="POST", datos=datos_registro)
+            
+            if respuesta["status"] == "success":
+                messagebox.showinfo("Registro exitoso", "¡Te has registrado correctamente!")
+                self.pantalla_login()
+            else:
+                messagebox.showerror("Error", respuesta.get("message", "Error desconocido durante el registro"))
+        except Exception as e:
+            messagebox.showerror("Error", str(e))
 
     def pantalla_principal(self):
         """Muestra el menú principal con botones para cada funcionalidad del sistema."""
         
         self.limpiar_pantalla()
-        self.root.title(f"Bienvenido {self.usuario.nombre}")
+        self.root.title(f"Bienvenido {self.datos_usuario['nombre']}")
 
-        tk.Label(self.root, text=f"👋 Hola, {self.usuario.nombre}", font=("Arial", 14)).pack(pady=10)
+        tk.Label(self.root, text=f"👋 Hola, {self.datos_usuario['nombre']}", font=("Arial", 14)).pack(pady=10)
         tk.Button(self.root, text="📍 Ver mis rutas", width=25, command=self.ver_rutas).pack(pady=5)
         tk.Button(self.root, text="👥 Ver mis amigos", width=25, command=self.ver_amigos).pack(pady=5)
         tk.Button(self.root, text="☁️ Consultar el clima", width=25, command=self.ver_clima).pack(pady=5)
@@ -129,7 +193,7 @@ class Interfaz:
             "Origen:",
             "Puntos intermedios (separados por comas):",
             "Destino:",
-            "Modo de transporte (caminar/bicicleta/coche):",
+            "Modo de transporte (walk/bike/drive):",
             "Nombre de la ruta (opcional):"
         ]
         self.entries_ruta_manual = []
@@ -144,9 +208,10 @@ class Interfaz:
         tk.Button(self.root, text="Volver", command=self.pantalla_principal).pack(pady=5)
 
     def crear_ruta_manual(self):
-        """Recoge los datos del formulario y crea una ruta manual para el usuario."""
+        """Recoge los datos del formulario y crea una ruta manual a través de la API."""
         origen = self.entries_ruta_manual[0].get().strip()
-        intermedios = self.entries_ruta_manual[1].get().strip().split(",") if self.entries_ruta_manual[1].get().strip() else []
+        intermedios_texto = self.entries_ruta_manual[1].get().strip()
+        intermedios = [p.strip() for p in intermedios_texto.split(",") if p.strip()] if intermedios_texto else []
         destino = self.entries_ruta_manual[2].get().strip()
         modo = self.entries_ruta_manual[3].get().strip().lower()
         nombre = self.entries_ruta_manual[4].get().strip() or None
@@ -156,9 +221,24 @@ class Interfaz:
             return
 
         try:
-            pdf, gpx, html = RutaManual.crear_ruta_desde_datos(origen, intermedios, destino, modo, nombre, self.usuario)
-            messagebox.showinfo("Ruta creada", f"Ruta creada con éxito.\nPDF: {pdf}\nGPX: {gpx}\nHTML: {html}")
-            self.pantalla_principal()
+            datos = {
+                "origen": origen,
+                "puntos_intermedios": intermedios,
+                "destino": destino,
+                "modo": modo,
+                "nombre": nombre,
+                "username": self.usuario
+            }
+            
+            respuesta = self.hacer_peticion("/api/rutas", metodo="POST", datos=datos)
+            
+            if respuesta["status"] == "success":
+                archivos = respuesta["data"]["archivos"]
+                mensaje = f"Ruta creada con éxito.\nPDF: {archivos['pdf']}\nGPX: {archivos['gpx']}\nHTML: {archivos['html']}"
+                messagebox.showinfo("Ruta creada", mensaje)
+                self.pantalla_principal()
+            else:
+                messagebox.showerror("Error", respuesta.get("message", "No se pudo crear la ruta"))
         except Exception as e:
             messagebox.showerror("Error", f"No se pudo crear la ruta: {str(e)}")
 
@@ -181,7 +261,8 @@ class Interfaz:
 
     def crear_rutas_automaticas(self):
         """Genera rutas automáticas basadas en direcciones introducidas por el usuario."""
-        direcciones = self.entry_direcciones_auto.get().strip().split(",")
+        direcciones_texto = self.entry_direcciones_auto.get().strip()
+        direcciones = [d.strip() for d in direcciones_texto.split(",") if d.strip()]
         cantidad_texto = self.entry_cantidad_auto.get().strip()
 
         try:
@@ -190,23 +271,28 @@ class Interfaz:
             messagebox.showerror("Error", "La cantidad debe ser un número entero.")
             return
 
-        direcciones = [d.strip() for d in direcciones if d.strip()]
-
         if len(direcciones) < 2:
             messagebox.showerror("Error", "Introduce al menos dos direcciones válidas.")
             return
 
         try:
-            generador = RutaAuto()
-            resultados = generador.generar_rutas_desde_direcciones(direcciones, cantidad)
-
-            for linea in resultados:
-                nombre = linea.split("'")[1]
-                if nombre not in self.usuario.rutas:
-                    self.usuario.rutas.append(nombre)
-
-            Usuario.actualizar_rutas_usuario(self.usuario)
-            messagebox.showinfo("Rutas creadas", "\n".join(resultados))
+            datos = {
+                "direcciones": direcciones,
+                "cantidad": cantidad,
+                "username": self.usuario
+            }
+            
+            respuesta = self.hacer_peticion("/api/rutas/auto", metodo="POST", datos=datos)
+            
+            if respuesta["status"] == "success":
+                resultados = respuesta["data"]
+                if isinstance(resultados, list):
+                    messagebox.showinfo("Rutas creadas", "\n".join(resultados))
+                else:
+                    messagebox.showinfo("Rutas creadas", "Las rutas se han creado correctamente.")
+                self.pantalla_principal()
+            else:
+                messagebox.showerror("Error", respuesta.get("message", "No se pudieron generar las rutas"))
         except Exception as e:
             messagebox.showerror("Error", f"No se pudo generar las rutas: {str(e)}")
 
@@ -215,23 +301,30 @@ class Interfaz:
         self.limpiar_pantalla()
         tk.Label(self.root, text="Mis Rutas", font=("Arial", 16)).pack(pady=10)
 
-        if self.usuario.rutas:
-            for ruta in self.usuario.rutas:
-                frame = tk.Frame(self.root)
-                frame.pack(pady=5)
+        try:
+            respuesta = self.hacer_peticion(f"/api/usuarios/{self.usuario}/rutas")
+            
+            if respuesta["status"] == "success":
+                rutas = respuesta["data"]
+                
+                if rutas:
+                    for ruta in rutas:
+                        frame = tk.Frame(self.root)
+                        frame.pack(pady=5)
 
-                tk.Label(frame, text=ruta, font=("Arial", 12)).pack(side="left", padx=10)
+                        tk.Label(frame, text=ruta, font=("Arial", 12)).pack(side="left", padx=10)
 
-                pdf_path = f"static/{ruta}.pdf"
-                html_path = f"static/rutas_{ruta}.html"
+                        pdf_url = f"{self.API_URL}/static/{ruta}.pdf"
+                        html_url = f"{self.API_URL}/static/rutas_{ruta}.html"
 
-                if os.path.exists(pdf_path):
-                    tk.Button(frame, text="📄 Ver PDF", command=lambda p=pdf_path: self.abrir_archivo(p)).pack(side="left", padx=5)
-
-                if os.path.exists(html_path):
-                    tk.Button(frame, text="🌐 Ver HTML", command=lambda h=html_path: self.abrir_archivo(h)).pack(side="left", padx=5)
-        else:
-            tk.Label(self.root, text="No tienes rutas asignadas aún.").pack(pady=5)
+                        tk.Button(frame, text="📄 Ver PDF", command=lambda p=pdf_url: webbrowser.open(p)).pack(side="left", padx=5)
+                        tk.Button(frame, text="🌐 Ver HTML", command=lambda h=html_url: webbrowser.open(h)).pack(side="left", padx=5)
+                else:
+                    tk.Label(self.root, text="No tienes rutas asignadas aún.").pack(pady=5)
+            else:
+                messagebox.showerror("Error", respuesta.get("message", "No se pudieron obtener las rutas"))
+        except Exception as e:
+            messagebox.showerror("Error", f"No se pudieron cargar las rutas: {str(e)}")
 
         tk.Button(self.root, text="Volver", command=self.pantalla_principal).pack(pady=10)
 
@@ -240,37 +333,39 @@ class Interfaz:
         self.limpiar_pantalla()
         tk.Label(self.root, text="Rutas en común con amigos", font=("Arial", 16)).pack(pady=10)
 
-        for amigo in self.usuario.amigos:
-            tk.Label(self.root, text=f"Amigo: {amigo}").pack(pady=5)
-
-            rutas_comunes = set(self.usuario.rutas).intersection(set(self.get_rutas_amigo(amigo)))
-            for ruta in rutas_comunes:
-                tk.Label(self.root, text=f"Ruta en común: {ruta}").pack(pady=5)
-
-                ruta_path = f"rutas/{ruta}.json"
-                if os.path.exists(ruta_path):
-                    with open(ruta_path, "r") as f:
-                        ruta_data = json.load(f)
-                        origen = ruta_data.get("origen", "Desconocido")
-                        destino = ruta_data.get("destino", "Desconocido")
-                        tk.Label(self.root, text=f"Origen: {origen} → Destino: {destino}", font=("Arial", 12)).pack(pady=5)
-
-                pdf_path = f"static/{ruta}.pdf"
-                html_path = f"static/rutas_{ruta}.html"
-
-                if os.path.exists(pdf_path):
-                    tk.Button(self.root, text=f"Ver PDF de {ruta}", command=lambda r=pdf_path: self.abrir_archivo(r)).pack(pady=5)
-                if os.path.exists(html_path):
-                    tk.Button(self.root, text=f"Ver HTML de {ruta}", command=lambda r=html_path: self.abrir_archivo(r)).pack(pady=5)
+        try:
+            respuesta = self.hacer_peticion("/api/usuarios/amigos")
+            
+            if respuesta["status"] == "success":
+                amigos_data = respuesta["data"]
+                usuario_amigos = amigos_data.get(self.usuario, {})
+                
+                if usuario_amigos:
+                    for amigo, rutas_comunes in usuario_amigos.items():
+                        tk.Label(self.root, text=f"Amigo: {amigo}", font=("Arial", 12, "bold")).pack(pady=5)
+                        
+                        if rutas_comunes:
+                            for ruta in rutas_comunes:
+                                frame = tk.Frame(self.root)
+                                frame.pack(pady=5)
+                                
+                                tk.Label(frame, text=f"Ruta en común: {ruta}").pack(side="left", padx=10)
+                                
+                                pdf_url = f"{self.API_URL}/static/{ruta}.pdf"
+                                html_url = f"{self.API_URL}/static/rutas_{ruta}.html"
+                                
+                                tk.Button(frame, text="📄 Ver PDF", command=lambda p=pdf_url: webbrowser.open(p)).pack(side="left", padx=5)
+                                tk.Button(frame, text="🌐 Ver HTML", command=lambda h=html_url: webbrowser.open(h)).pack(side="left", padx=5)
+                        else:
+                            tk.Label(self.root, text="No tienen rutas en común.").pack(pady=5)
+                else:
+                    tk.Label(self.root, text="No tienes amigos registrados.").pack(pady=5)
+            else:
+                messagebox.showerror("Error", respuesta.get("message", "No se pudieron obtener los amigos"))
+        except Exception as e:
+            messagebox.showerror("Error", f"No se pudieron cargar los amigos: {str(e)}")
 
         tk.Button(self.root, text="Volver", command=self.pantalla_principal).pack(pady=10)
-
-    def get_rutas_amigo(self, amigo_username):
-        """Devuelve las rutas asociadas a un amigo dado su nombre de usuario."""
-        for usuario in Usuario.cargar_usuarios():
-            if usuario['username'] == amigo_username:
-                return usuario['rutas']
-        return []
 
     def ver_clima(self):
         """Muestra un formulario para consultar el clima en una ciudad específica."""
@@ -284,7 +379,7 @@ class Interfaz:
         tk.Button(self.root, text="Volver", command=self.pantalla_principal).pack(pady=10)
 
     def consultar_clima(self):
-        """Consulta el clima actual para la ciudad ingresada por el usuario."""
+        """Consulta el clima actual para la ciudad ingresada por el usuario a través de la API."""
         ciudad = self.entry_ciudad_clima.get().strip()
 
         if not ciudad:
@@ -292,12 +387,21 @@ class Interfaz:
             return
 
         try:
-            clima = self.gestor_clima.consultar_clima(ciudad)
-            clima_info = f"Ciudad: {clima.ciudad}\nTemperatura: {clima.temperatura}°C\nHumedad: {clima.humedad}%\n" \
-                         f"Descripción: {clima.descripcion}\nViento: {clima.viento} m/s\nFecha: {clima.fecha.strftime('%Y-%m-%d %H:%M:%S')}"
-            messagebox.showinfo("Clima", clima_info)
+            respuesta = self.hacer_peticion("/api/clima", params={"ciudad": ciudad})
+            
+            if respuesta["status"] == "success":
+                clima = respuesta["data"]
+                clima_info = f"Ciudad: {clima.get('ciudad', 'N/A')}\n" \
+                             f"Temperatura: {clima.get('temperatura', 'N/A')}°C\n" \
+                             f"Humedad: {clima.get('humedad', 'N/A')}%\n" \
+                             f"Descripción: {clima.get('descripcion', 'N/A')}\n" \
+                             f"Viento: {clima.get('viento', 'N/A')} m/s\n" \
+                             f"Fecha: {clima.get('fecha', 'N/A')}"
+                messagebox.showinfo("Clima", clima_info)
+            else:
+                messagebox.showerror("Error", respuesta.get("message", "No se pudo obtener el clima"))
         except Exception as e:
-            messagebox.showerror("Error", f"No se pudo obtener el clima. {str(e)}")
+            messagebox.showerror("Error", f"No se pudo obtener el clima: {str(e)}")
 
     def ver_todas_las_rutas(self):
         """
@@ -306,9 +410,7 @@ class Interfaz:
         Permite filtrar por dificultad, distancia, duración y modo de transporte.
         Las rutas se muestran en un panel scrollable con botones para ver PDF y HTML.
         """
-
         self.limpiar_pantalla()
-        gestor = GestorRutas()
 
         tk.Label(self.root, text="🧭 Filtrar Rutas del Sistema", font=("Arial", 16)).pack(pady=10)
 
@@ -335,127 +437,99 @@ class Interfaz:
         # Botones de control
         control_frame = tk.Frame(self.root)
         control_frame.pack(pady=10)
-        tk.Button(control_frame, text="Aplicar filtros", command=lambda: aplicar_filtros()).pack(side="left", padx=10)
+        tk.Button(control_frame, text="Aplicar filtros", command=lambda: self.aplicar_filtros_rutas()).pack(side="left", padx=10)
         tk.Button(control_frame, text="Volver", command=self.pantalla_principal).pack(side="left", padx=10)
 
         # Scroll
         canvas = tk.Canvas(self.root, height=350)
         scrollbar = tk.Scrollbar(self.root, orient="vertical", command=canvas.yview)
-        scroll_frame = tk.Frame(canvas)
+        self.scroll_frame = tk.Frame(canvas)
 
-        scroll_frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
-        canvas.create_window((0, 0), window=scroll_frame, anchor="nw")
+        self.scroll_frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+        canvas.create_window((0, 0), window=self.scroll_frame, anchor="nw")
         canvas.configure(yscrollcommand=scrollbar.set)
         canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
 
-        def extraer_numero(valor: str) -> float:
-            """
-            Extrae el primer número flotante de una cadena.
+        # Cargar todas las rutas al inicio
+        self.aplicar_filtros_rutas()
 
-            Parameters
-            ----------
-            valor : str
-                Cadena que contiene un número al inicio.
+    def aplicar_filtros_rutas(self):
+        """
+        Aplica los filtros introducidos por el usuario a las rutas a través de la API.
 
-            Returns
-            -------
-            float
-                Número extraído o infinito si no es válido.
-            """
+        Usa dificultad, distancia, duración y modo de transporte como filtros.
+        """
+        dificultad = self.filtro_dificultad.get().strip().lower()
+        distancia = self.filtro_distancia.get().strip()
+        duracion = self.filtro_duracion.get().strip()
+        modo = self.filtro_modo.get().strip().lower()
 
-            try:
-                return float(valor.split()[0])
-            except:
-                return float('inf')
+        # Limpiar el panel de rutas
+        for widget in self.scroll_frame.winfo_children():
+            widget.destroy()
 
-        def mostrar_rutas(rutas):
-            """
-            Muestra visualmente las rutas en el panel scrollable.
+        try:
+            params = {}
+            if dificultad:
+                params["dificultad"] = dificultad
+            if distancia:
+                params["max_km"] = float(distancia)
+            if duracion:
+                params["max_horas"] = float(duracion)
+            if modo:
+                params["modo_transporte"] = modo
+                
+            respuesta = self.hacer_peticion("/api/rutas/filtrar", params=params)
+            
+            if respuesta["status"] == "success":
+                self.mostrar_rutas(respuesta["data"])
+            else:
+                messagebox.showerror("Error", respuesta.get("message", "No se pudieron filtrar las rutas"))
+        except ValueError as e:
+            messagebox.showerror("Error de formato", str(e))
+        except Exception as e:
+            messagebox.showerror("Error", f"No se pudieron cargar las rutas: {str(e)}")
 
-            Parameters
-            ----------
-            rutas : list
-                Lista de rutas en formato diccionario.
-            """
+    def mostrar_rutas(self, rutas):
+        """
+        Muestra visualmente las rutas en el panel scrollable.
 
-            for widget in scroll_frame.winfo_children():
-                widget.destroy()
+        Parameters
+        ----------
+        rutas : list
+            Lista de rutas en formato diccionario.
+        """
+        if not rutas:
+            tk.Label(self.scroll_frame, text="No se encontraron rutas con los filtros aplicados.").pack(pady=10)
+            return
 
-            for r in rutas:
-                frame = tk.Frame(scroll_frame, bd=1, relief="solid", padx=5, pady=5)
-                frame.pack(padx=10, pady=5, fill="x")
+        for r in rutas:
+            frame = tk.Frame(self.scroll_frame, bd=1, relief="solid", padx=5, pady=5)
+            frame.pack(padx=10, pady=5, fill="x")
 
-                texto = f"📍 {r['nombre']} | {r['distancia']} | {r['duracion']} | Dificultad: {r['dificultad']}\n{r['origen']} → {r['destino']} ({r['modo_transporte']})"
-                tk.Label(frame, text=texto, font=("Arial", 10), justify="left", anchor="w").pack(anchor="w")
+            texto = f"📍 {r.get('nombre', 'Sin nombre')} | {r.get('distancia', 'N/A')} | {r.get('duracion', 'N/A')} | Dificultad: {r.get('dificultad', 'N/A')}\n{r.get('origen', 'N/A')} → {r.get('destino', 'N/A')} ({r.get('modo_transporte', 'N/A')})"
+            tk.Label(frame, text=texto, font=("Arial", 10), justify="left", anchor="w").pack(anchor="w")
 
-                # Botones de exportación
-                nombre_archivo = r["nombre"]
-                pdf_path = os.path.join("static", f"{nombre_archivo}.pdf")
-                html_path = os.path.join("static", f"rutas_{nombre_archivo}.html")
+            # Botones de exportación
+            nombre_archivo = r.get("nombre", "")
+            btn_frame = tk.Frame(frame)
+            btn_frame.pack(anchor="e", pady=5)
 
-                btn_frame = tk.Frame(frame)
-                btn_frame.pack(anchor="e", pady=5)
+            pdf_url = f"{self.API_URL}/static/{nombre_archivo}.pdf"
+            html_url = f"{self.API_URL}/static/rutas_{nombre_archivo}.html"
 
-                if os.path.exists(pdf_path):
-                    tk.Button(btn_frame, text="📄 Ver PDF", command=lambda p=pdf_path: self.abrir_archivo(p)).pack(side="left", padx=5)
-                if os.path.exists(html_path):
-                    tk.Button(btn_frame, text="🌐 Ver HTML", command=lambda h=html_path: self.abrir_archivo(h)).pack(side="left", padx=5)
-
-        def aplicar_filtros():
-            """
-            Aplica los filtros introducidos por el usuario a las rutas.
-
-            Usa dificultad, distancia, duración y modo de transporte como filtros.
-            """
-
-            dificultad = self.filtro_dificultad.get().strip().lower()
-            distancia = self.filtro_distancia.get().strip()
-            duracion = self.filtro_duracion.get().strip()
-            modo = self.filtro_modo.get().strip().lower()
-
-            try:
-                max_km = float(distancia) if distancia else float('inf')
-            except:
-                max_km = float('inf')
-            try:
-                max_h = float(duracion) if duracion else float('inf')
-            except:
-                max_h = float('inf')
-
-            try:
-                rutas_filtradas = gestor.lista_rutas()
-                if modo:
-                    rutas_filtradas = gestor.filtrar_por_transporte(modo)
-                if dificultad:
-                    rutas_filtradas = [r for r in rutas_filtradas if r["dificultad"].lower() == dificultad]
-                rutas_filtradas = [
-                    r for r in rutas_filtradas
-                    if extraer_numero(r["distancia"]) <= max_km and extraer_numero(r["duracion"]) <= max_h
-                ]
-                mostrar_rutas(rutas_filtradas)
-            except ValueError as e:
-                messagebox.showerror("Modo de transporte no válido", str(e))
-
-        # Mostrar todas al inicio
-        mostrar_rutas(gestor.lista_rutas())
-
+            tk.Button(btn_frame, text="📄 Ver PDF", command=lambda p=pdf_url: webbrowser.open(p)).pack(side="left", padx=5)
+            tk.Button(btn_frame, text="🌐 Ver HTML", command=lambda h=html_url: webbrowser.open(h)).pack(side="left", padx=5)
 
     def cerrar_sesion(self):
         """Cierra la sesión del usuario actual y vuelve al login."""
         self.usuario = None
+        self.datos_usuario = None
         self.root.title("Gestor de Rutas - Login")
         self.pantalla_login()
-
-    def abrir_archivo(self, archivo_path):
-        """Abre un archivo local (PDF o HTML) en el navegador predeterminado."""
-        try:
-            webbrowser.open(archivo_path)
-        except Exception as e:
-            messagebox.showerror("Error", f"No se pudo abrir el archivo. {str(e)}")
 
     def limpiar_pantalla(self):
         """Elimina todos los elementos visibles de la ventana actual."""
         for widget in self.root.winfo_children():
             widget.destroy()
-
