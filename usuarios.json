@@ -220,7 +220,8 @@
         "rutas": [
             "Ruta_11",
             "Ruta_27",
-            "ruta_manual_8244"
+            "ruta_manual_8244",
+            "prueba1"
         ]
     },
     {
@@ -320,6 +321,18 @@
         "ciudad": "Alicante",
         "password": "ana123",
         "fecha_registro": "2025-04-03T13:52:46.872775",
+        "rutas": []
+    },
+    {
+        "nombre": "Andrés",
+        "apellido": "Francés",
+        "email": "andres@email.com",
+        "username": "afp33",
+        "telefono": "666555444",
+        "fecha_nacimiento": "2005-12-05",
+        "ciudad": "Villena",
+        "password": "prueba",
+        "fecha_registro": "2025-04-08T13:27:29.141178",
         "rutas": []
     }
 ]
