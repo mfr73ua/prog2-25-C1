@@ -31,10 +31,13 @@ A continuación se muestra la estructura del proyecto:
 ├── static/
 |   ├── ...
 ├── app_instance.py
+├── Direcciones_para_probar.txt
+├── Gestor_de_Rutas.exe # Ejecutable para probar la API en la nube
 ├── geocodificador.py
 ├── gestor_rutas.py
 ├── interfaz.py
 ├── main.py
+├── miapp.py # Implementación de la API en pythonanywhere
 ├── requirements.txt
 ├── run.py
 ├── ruta_auto.py
@@ -104,32 +107,35 @@ El proyecto está dividido en módulos altamente cohesivos y con responsabilidad
 - `main.py`: punto de entrada para ejecutar la app.
 
 
-
 ![Diagrama del proyecto](diagram.png)
-
 
 
 #### Distribución de las tareas en el grupo
 - [Marta](https://github.com/martalopez6) -> gestor_rutas.py, ruta.py, api/__init__ y api/rutas.py
 - [Germán](https://github.com/ghr8) -> usuario.py, usuarios.json, requeriments.txt, api/usuarios
-- [Marcos](https://github.com/mfr73ua) -> interfaz.py, utils.py, static/, Readme.md, tests/
+- [Marcos](https://github.com/mfr73ua) -> interfaz.py, utils.py, static/, Readme.md
 - [David](https://github.com/Gallego-DavidGonzalez) -> ruta_auto.py, main.py, rutas/, app_instance.py, run.py
 - [Rares](https://github.com/ra-and5) -> servicio_clima.py, ruta_manual.py, geocodificador.py, api/clima, gestión API en pythonanywhere y ejecutable .exe
 
 ## Instrucciones de instalación y ejecución
+
 Para la ejecución del código en local recomendamos clonar el repositorio desde el siguiente comando:
+
    ```bash
    git clone https://github.com/mfr73ua/prog2-25-C3.git
    ```
 A continuación recomendamos la creación de un venv:
+
    ```bash
    python3 -m venv <nombre_venv>
    ```
 Activamos el venv:
+
    ```bash
    source <nombre_venv>/bin/activate
    ```
 Para la instalación de las librerías necesarias para la ejecución del proyecto ejecute el siguiente comando:
+
    ```bash
    pip install -r requeriments.txt
    ```
@@ -139,10 +145,12 @@ Para la instalación de las librerías necesarias para la ejecución del proyect
 
 ## Resumen de la API
 
-Actualmente, el sistema cuenta con una API que permite procesar rutas desde el backend. Esta API está pensada como punto de entrada para automatizar la generación de rutas y obtener archivos exportados como GPX, PDF y HTML ligada a la interfaz gráfica. 
+Actualmente, el sistema cuenta con una API que permite procesar rutas desde el backend. Esta API está pensada como punto de entrada para automatizar la generación de rutas y obtener archivos exportados como GPX, PDF y HTML ligada a la interfaz gráfica.
+
+**Para la ejecución en la nube de nuestro proyecto, descarga el fichero .exe que proporcionamos a continuación o al clonar el repositorio ejecútalo:**
 
 [Enlace a nuestra API en `pythonanywhere`](https://ra55.pythonanywhere.com/)
-[Enlace de descarga del fichero `.exe`]()
+[Enlace de descarga del fichero `.exe`](https://drive.google.com/file/d/1YMEG0hgodZIYW5bq34iUoUPS6zW8CeV8/view?usp=sharing)
 
 ### Autenticación
 
