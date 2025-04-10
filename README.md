@@ -12,7 +12,7 @@
 
 ## Requisitos
 
-Este proyecto consiste en una aplicación completa para la **creación, gestión, visualización y exportación de rutas geográficas**. Diseñado con un enfoque modular y extensible, el sistema ofrece una experiencia amigable al usuario gracias a su **interfaz gráfica construida con Tkinter**. Su funcionalidad se centra en generar rutas dentro de la provincia de Alicante, aprovechando los datos de OpenStreetMap y la API de OpenWeatherMap para enriquecer la experiencia del usuario.
+Este proyecto consiste en una aplicación completa para la **creación, gestión, visualización y exportación de rutas geográficas** entre usuarios. Diseñado con un enfoque modular y extensible, el sistema ofrece una experiencia amigable al usuario gracias a su **interfaz gráfica construida con Tkinter**. Su funcionalidad se centra en generar rutas dentro de la ciudad de Alicante, aprovechando los datos de OpenStreetMap y la API de OpenWeatherMap para enriquecer la experiencia del usuario.
 
 
 ### 🧭 Estructura de archivos del sistema de rutas
@@ -27,16 +27,10 @@ A continuación se muestra la estructura del proyecto:
 |   ├── rutas.py
 |   ├── usuarios.py
 ├── rutas/
+|   ├── ...
 ├── static/
-├── tests/
-│   ├── test1.py
-│   ├── test2.py
-│   ├── test3.py
-│   ├── test4.py
-│   ├── test5.py
-│   ├── test6.py
+|   ├── ...
 ├── app_instance.py
-├── distribucion.txt # Distribución de tareas entre los integrantes del grupo
 ├── geocodificador.py
 ├── gestor_rutas.py
 ├── interfaz.py
@@ -107,12 +101,25 @@ El proyecto está dividido en módulos altamente cohesivos y con responsabilidad
 - `geocodificador.py`: conversión de direcciones en coordenadas.
 - `servicio_clima.py`: consulta del clima mediante API.
 - `interfaz.py`: interfaz gráfica completa con menús y formularios.
-- `main.py`: punto de entrada para ejecutar la app o generar rutas masivas.
+- `main.py`: punto de entrada para ejecutar la app.
+
+
+
+![Diagrama del proyecto](diagram.png)
+
+
+
+#### Distribución de las tareas en el grupo
+- [Marta](https://github.com/martalopez6) -> gestor_rutas.py, ruta.py, api/__init__ y api/rutas.py
+- [Germán](https://github.com/ghr8) -> usuario.py, usuarios.json, requeriments.txt, api/usuarios
+- [Marcos](https://github.com/mfr73ua) -> interfaz.py, utils.py, static/, Readme.md, tests/
+- [David](https://github.com/Gallego-DavidGonzalez) -> ruta_auto.py, main.py, rutas/, app_instance.py, run.py
+- [Rares](https://github.com/ra-and5) -> servicio_clima.py, ruta_manual.py, geocodificador.py, api/clima, gestión API en pythonanywhere y ejecutable .exe
 
 ## Instrucciones de instalación y ejecución
-Para la ejecución del código recomendamos clonar el repositorio desde el siguiente comando:
+Para la ejecución del código en local recomendamos clonar el repositorio desde el siguiente comando:
    ```bash
-   git clone https://github.com/mfr73ua/prog2-25-C1.git
+   git clone https://github.com/mfr73ua/prog2-25-C3.git
    ```
 A continuación recomendamos la creación de un venv:
    ```bash
@@ -127,19 +134,119 @@ Para la instalación de las librerías necesarias para la ejecución del proyect
    pip install -r requeriments.txt
    ```
 
-A continuación con la simple ejecución del fichero `main.py` bastaría para probar nuestro proyecto en formato aplicación convencional.
+**Para la ejecución del proyecto en local basta con ejecutar el fichero `run.py` en una terminal bash y a continuación en otra terminal ejecutamos `main.py` para desplegar la interfaz funcional gracias a la API.**
 
 
 ## Resumen de la API
 
-Actualmente, el sistema cuenta con una API sencilla que permite procesar rutas desde el backend. Esta API está pensada como punto de entrada para automatizar la generación de rutas y obtener archivos exportados como GPX, PDF y HTML sin necesidad de usar la interfaz gráfica. El endpoint principal disponible es `/procesar_ruta`, accesible mediante una petición POST.
+Actualmente, el sistema cuenta con una API que permite procesar rutas desde el backend. Esta API está pensada como punto de entrada para automatizar la generación de rutas y obtener archivos exportados como GPX, PDF y HTML ligada a la interfaz gráfica. 
 
-Al enviar una solicitud a esta ruta, el sistema genera automáticamente una o varias rutas utilizando combinaciones predefinidas de direcciones reales en Alicante. Internamente, se calcula el grafo de calles, se buscan los caminos más cortos y se exportan los archivos asociados para cada ruta. La respuesta de la API devuelve un resumen de los archivos generados o un mensaje de error si algo falla en el proceso.
+[Enlace a nuestra API en `pythonanywhere`](https://ra55.pythonanywhere.com/)
+[Enlace de descarga del fichero `.exe`]()
 
-En resumen, esta API sirve como una base funcional para automatizar la creación de rutas. Es ideal para pruebas, generación masiva de rutas o integración inicial con otros servicios. 
+### Autenticación
 
-El sistema se puede ejecutar tanto como una aplicación normal con la interfaz gráfica en Tkinter como en modo API, lo cual permite automatizar la creación de rutas desde el backend sin necesidad de utilizar la interfaz gráfica. Para usarlo en modo gráfico, ejecuta `main.py`. Para usarlo como API, ejecuta `run.py`, y a continuación, si desea hacer unas pruebas, ejecute los diferentes tests alojados en el directorio `tests/` o pruebe la API desde un navegador o incluso desde la aplicación [Postman](https://www.postman.com/). En ambos casos, los archivos generados por el sistema (PDF, GPX, HTML, etc.) se guardarán en las carpetas correspondientes. Aunque actualmente no se reciben parámetros personalizados en la petición (es decir, no puedes indicar tus propios puntos aún), el sistema está preparado para crecer fácilmente. En resumen, esta API sirve como una base funcional para automatizar la creación de rutas. Es ideal para pruebas, generación masiva de rutas o integración inicial con otros servicios. 
+#### **Login**
+- **Método**: `POST`
+- **Endpoint**: `/api/login`
+- **Parámetros**:
+  - `username`: Nombre de usuario
+  - `password`: Contraseña del usuario
+- **Descripción**: Autentica al usuario y devuelve un mensaje de éxito con el nombre de usuario si las credenciales son correctas. Si son incorrectas, devuelve un error.
 
-El sistema se puede ejecutar tanto como una aplicación normal con la interfaz gráfica en Tkinter como en modo API, lo cual permite automatizar la creación de rutas desde el backend sin necesidad de utilizar la interfaz gráfica. Para usarlo en modo gráfico, ejecuta `main.py`. Para usarlo como API, ejecuta `run.py`, y a continuación, si desea hacer unas pruebas, ejecute los diferentes tests alojados en el directorio tests/. En ambos casos, los archivos generados por el sistema (PDF, GPX, HTML, etc.) se guardarán en las carpetas correspondientes.
+---
+
+### Gestión de Usuarios
+
+#### **Registrar un usuario**
+- **Método**: `POST`
+- **Endpoint**: `/api/registro`
+- **Parámetros**:
+  - `nombre`: Nombre del usuario
+  - `apellido`: Apellido del usuario
+  - `email`: Correo electrónico
+  - `username`: Nombre de usuario
+  - `telefono`: Número de teléfono
+  - `fecha_nacimiento`: Fecha de nacimiento
+  - `ciudad`: Ciudad de residencia
+  - `password`: Contraseña del usuario
+- **Descripción**: Registra un nuevo usuario en el sistema. Si el nombre de usuario ya existe, devuelve un error.
+
+#### **Obtener rutas de un usuario**
+- **Método**: `GET`
+- **Endpoint**: `/api/usuarios/<username>/rutas`
+- **Parámetros**:
+  - `username`: Nombre de usuario
+- **Descripción**: Obtiene todas las rutas asociadas al usuario especificado. Si el usuario no existe, devuelve un error.
+
+#### **Obtener rutas comunes entre dos usuarios**
+- **Método**: `GET`
+- **Endpoint**: `/api/usuarios/<username1>/rutas_comunes/<username2>`
+- **Parámetros**:
+  - `username1`: Nombre de usuario del primer usuario
+  - `username2`: Nombre de usuario del segundo usuario
+- **Descripción**: Obtiene las rutas comunes entre dos usuarios. Si alguno de los usuarios no existe, devuelve un error.
+
+#### **Obtener amigos con los que se comparten rutas**
+- **Método**: `GET`
+- **Endpoint**: `/api/usuarios/<username>/amigos_comunes`
+- **Parámetros**:
+  - `username`: Nombre de usuario
+- **Descripción**: Obtiene los amigos del usuario con los que comparte rutas, devolviendo las rutas comunes.
+
+---
+
+### Gestión de Rutas
+
+#### **Crear ruta manual**
+- **Método**: `POST`
+- **Endpoint**: `/api/ruta_manual`
+- **Parámetros**:
+  - `origen`: Punto de origen de la ruta
+  - `intermedios`: Puntos intermedios separados por comas
+  - `destino`: Punto de destino de la ruta
+  - `modo`: Modo de transporte (por ejemplo, "walk", "bike", "drive")
+  - `nombre`: Nombre de la ruta (opcional)
+  - `username`: Nombre de usuario del creador
+  - `password`: Contraseña del creador
+- **Descripción**: Crea una ruta manual y genera archivos PDF, GPX y HTML. Si la creación es exitosa, devuelve los archivos generados. Si ocurre un error, devuelve un mensaje de error.
+
+#### **Crear rutas automáticas**
+- **Método**: `POST`
+- **Endpoint**: `/api/ruta_auto`
+- **Parámetros**:
+  - `direcciones`: Lista de direcciones separadas por comas
+  - `cantidad`: Cantidad de rutas a generar
+  - `username`: Nombre de usuario del creador
+  - `password`: Contraseña del creador
+- **Descripción**: Crea rutas automáticas basadas en las direcciones proporcionadas. Si la creación es exitosa, devuelve las rutas generadas. Si ocurre un error, devuelve un mensaje de error.
+
+#### **Obtener rutas filtradas**
+- **Método**: `GET`
+- **Endpoint**: `/api/rutas`
+- **Parámetros**:
+  - `dificultad`: (opcional) Dificultad de la ruta (`bajo`, `medio`, `alto`)
+  - `max_km`: (opcional) Distancia máxima en kilómetros
+  - `max_horas`: (opcional) Duración máxima en horas
+  - `transporte`: (opcional) Medio de transporte (`walk`, `bike`, `drive`)
+- **Descripción**: Obtiene las rutas filtradas según los parámetros proporcionados (dificultad, distancia, duración, y medio de transporte).
+
+---
+
+### Descargas
+
+#### **Descargar PDF de una ruta**
+- **Método**: `GET`
+- **Endpoint**: `/api/rutas/<nombre>/pdf`
+- **Parámetros**:
+  - `nombre`: Nombre de la ruta
+- **Descripción**: Permite descargar el archivo PDF correspondiente a la ruta especificada.
+
+#### **Descargar HTML de una ruta**
+- **Método**: `GET`
+- **Endpoint**: `/api/rutas/<nombre>/html`
+- **Parámetros**:
+  - `nombre`: Nombre de la ruta
+- **Descripción**: Permite descargar el archivo HTML correspondiente a la ruta especificada.
 
 
