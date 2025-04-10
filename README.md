@@ -14,7 +14,6 @@
 
 Este proyecto consiste en una aplicación completa para la **creación, gestión, visualización y exportación de rutas geográficas** entre usuarios. Diseñado con un enfoque modular y extensible, el sistema ofrece una experiencia amigable al usuario gracias a su **interfaz gráfica construida con Tkinter**. Su funcionalidad se centra en generar rutas dentro de la ciudad de Alicante, aprovechando los datos de OpenStreetMap y la API de OpenWeatherMap para enriquecer la experiencia del usuario.
 
-
 ### 🧭 Estructura de archivos del sistema de rutas
 
 A continuación se muestra la estructura del proyecto:
@@ -33,6 +32,8 @@ A continuación se muestra la estructura del proyecto:
 ├── app_instance.py
 ├── Direcciones_para_probar.txt
 ├── Gestor_de_Rutas.exe # Ejecutable para probar la API en la nube
+├── static/
+├── app_instance.py
 ├── geocodificador.py
 ├── gestor_rutas.py
 ├── interfaz.py
@@ -60,7 +61,6 @@ Cada ruta generada se exporta automáticamente en cuatro formatos distintos:
 
 Además, se clasifica automáticamente cada ruta según su **nivel de dificultad** (bajo, medio, alto) dependiendo de la distancia, y se estima la duración en función del medio de transporte elegido: caminar, bicicleta o coche.
 
-
 ### 🛠️ Rutas manuales y automáticas
 
 El sistema ofrece dos formas principales de crear rutas:
@@ -71,7 +71,6 @@ El sistema ofrece dos formas principales de crear rutas:
 
 Todas las rutas creadas quedan almacenadas como archivos `.json` y se asocian al usuario correspondiente dentro de una base de datos persistente en `usuarios.json`.
 
-
 ### 👤 Gestión de usuarios y relaciones sociales
 
 El sistema incluye un **módulo completo de autenticación** que permite a los usuarios registrarse, iniciar sesión y almacenar sus rutas. Los datos personales (nombre, email, ciudad, etc.) se guardan junto con una lista de rutas creadas y una lista de amigos.
@@ -79,7 +78,6 @@ El sistema incluye un **módulo completo de autenticación** que permite a los u
 La lógica de amistad se basa en la detección automática de **rutas compartidas**: si dos usuarios tienen al menos una ruta en común, se consideran amigos. La interfaz permite consultar las rutas en común con cada amigo y acceder a sus archivos exportados.
 
 Cada usuario puede visualizar sus rutas guardadas, abrir el archivo PDF o HTML asociado directamente desde la interfaz, y consultar información básica como origen, destino, y modo de transporte.
-
 
 ### ☁️ Consulta meteorológica integrada
 
@@ -119,10 +117,10 @@ El proyecto está dividido en módulos altamente cohesivos y con responsabilidad
 
 ## Instrucciones de instalación y ejecución
 
-Para la ejecución del código en local recomendamos clonar el repositorio desde el siguiente comando:
+Para la ejecución del código recomendamos clonar el repositorio desde el siguiente comando:
 
    ```bash
-   git clone https://github.com/mfr73ua/prog2-25-C3.git
+   git clone https://github.com/mfr73ua/prog2-25-C1.git
    ```
 A continuación recomendamos la creación de un venv:
 
@@ -134,14 +132,13 @@ Activamos el venv:
    ```bash
    source <nombre_venv>/bin/activate
    ```
-Para la instalación de las librerías necesarias para la ejecución del proyecto ejecute el siguiente comando:
+Para la instalación de las librerías necesarias para la ejecución del proyecto ejecute el siguiente comando dentro del repositorio (directorio) clonado:
 
    ```bash
    pip install -r requeriments.txt
    ```
 
 **Para la ejecución del proyecto en local basta con ejecutar el fichero `run.py` en una terminal bash y a continuación en otra terminal ejecutamos `main.py` para desplegar la interfaz funcional gracias a la API.**
-
 
 ## Resumen de la API
 
@@ -256,5 +253,3 @@ Actualmente, el sistema cuenta con una API que permite procesar rutas desde el b
 - **Parámetros**:
   - `nombre`: Nombre de la ruta
 - **Descripción**: Permite descargar el archivo HTML correspondiente a la ruta especificada.
-
-
