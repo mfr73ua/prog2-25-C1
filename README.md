@@ -148,6 +148,7 @@ Actualmente, el sistema cuenta con una API que permite procesar rutas desde el b
 
 [Enlace a nuestra API en `pythonanywhere`](https://ra55.pythonanywhere.com/)
 [Enlace de descarga del fichero `.exe`](https://drive.google.com/file/d/1YMEG0hgodZIYW5bq34iUoUPS6zW8CeV8/view?usp=sharing)
+***[Enlace de descarga del fichero `.exe` version 2.0](https://drive.google.com/file/d/1HfRWwjR6NMNGLZZLgajzY7-0aqw2ylVs/view?usp=sharing)***
 
 ### Autenticación
 
