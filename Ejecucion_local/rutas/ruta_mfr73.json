@@ -1,0 +1,17 @@
+{
+    "nombre": "ruta_mfr73",
+    "ubicacion": [
+        38.33866777185664,
+        -0.495134602986417
+    ],
+    "distancia": "1.94 km",
+    "duracion": "23 min",
+    "dificultad": "bajo",
+    "fecha_registro": "2025-05-15 12:24:10",
+    "origen": "Calle Belando",
+    "puntos_intermedios": [
+        "Plaza de los Luceros"
+    ],
+    "destino": "Playa del Postiguet",
+    "modo_transporte": "walk"
+}
